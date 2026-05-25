@@ -1,0 +1,40 @@
+name: Smart Test Selection
+
+on:
+  pull_request:
+    branches: [main, stable]
+  workflow_dispatch:
+
+jobs:
+  smart-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          # Fetch full history so p4opt can diff PR base..head
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Click (target project) + test deps
+        run: |
+          pip install -e .
+          pip install pytest pytest-json-report
+
+      - name: Install P4CIOptimizer
+        run: pip install "git+https://github.com/p4chirag/p4ciopt.git@main"
+
+      - name: Smart Test Selection (with full-suite comparison)
+        run: |
+          p4opt ci \
+            --vcs git \
+            --from ${{ github.event.pull_request.base.sha }} \
+            --to   ${{ github.event.pull_request.head.sha }} \
+            --project . \
+            --compare
