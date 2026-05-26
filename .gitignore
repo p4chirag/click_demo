@@ -7,3 +7,8 @@ htmlcov/
 .tox/
 docs/_build/
 .venv/
+
+# P4CIOptimizer local artifacts
+p4opt.db
+*.db-journal
+
