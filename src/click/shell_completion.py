@@ -35,7 +35,7 @@ def shell_complete(
         instruction and shell, in the form ``instruction_shell``.
     :return: Status code to exit with.
     """
-    shell, _, instruction = instruction.partition("_")
+    shell, _, action = instruction.partition("_")
     comp_cls = get_completion_class(shell)
 
     if comp_cls is None:
@@ -44,11 +44,11 @@ def shell_complete(
     comp = comp_cls(cli, ctx_args, prog_name, complete_var)
 
     # Write bytes, otherwise Windows text stdout translates LF to CRLF and breaks.
-    if instruction == "source":
+    if action == "source":
         echo(comp.source().encode(), nl=False)
         return 0
 
-    if instruction == "complete":
+    if action == "complete":
         echo(comp.complete().encode())
         return 0
 
